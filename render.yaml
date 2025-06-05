@@ -1,6 +1,3 @@
-// Add this file to your GitHub repository to enable Render Blueprint deployment
-// This file should be committed to the root of your backend repository
-
 services:
   # Backend API Service
   - type: web
