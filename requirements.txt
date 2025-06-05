@@ -1,6 +1,3 @@
-// This file needs to be added to the backend repository to enable Render deployment
-// It installs gunicorn which is needed for the web service
-
 Flask==2.0.1
 SQLAlchemy==1.4.23
 Flask-SQLAlchemy==2.5.1
