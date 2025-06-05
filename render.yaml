@@ -1,0 +1,41 @@
+// Add this file to your GitHub repository to enable Render Blueprint deployment
+// This file should be committed to the root of your backend repository
+
+services:
+  # Backend API Service
+  - type: web
+    name: crewly-backend
+    env: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn src.main:app
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.0
+      - key: DB_USERNAME
+        sync: false
+      - key: DB_PASSWORD
+        sync: false
+      - key: DB_HOST
+        fromDatabase:
+          name: crewly-db
+          property: host
+      - key: DB_PORT
+        fromDatabase:
+          name: crewly-db
+          property: port
+      - key: DB_NAME
+        fromDatabase:
+          name: crewly-db
+          property: database
+      - key: SECRET_KEY
+        generateValue: true
+      - key: FLASK_ENV
+        value: production
+      - key: CORS_ALLOWED_ORIGINS
+        value: https://crewly-frontend.onrender.com
+
+databases:
+  - name: crewly-db
+    databaseName: crewly
+    user: crewly_user
+    plan: free

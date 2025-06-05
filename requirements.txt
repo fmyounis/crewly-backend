@@ -1,5 +1,10 @@
-Flask==3.1.0
-Flask-SQLAlchemy==3.1.1
-PyMySQL==1.1.1
-SQLAlchemy==2.0.40
-cryptography==36.0.2
+// This file needs to be added to the backend repository to enable Render deployment
+// It installs gunicorn which is needed for the web service
+
+Flask==2.0.1
+SQLAlchemy==1.4.23
+Flask-SQLAlchemy==2.5.1
+Flask-Cors==3.0.10
+PyJWT==2.1.0
+gunicorn==20.1.0
+psycopg2-binary==2.9.1
