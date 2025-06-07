@@ -72,8 +72,8 @@ class Employee(db.Model):
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     
     # Relationships
-    shifts = db.relationship('Shift', backref='employee', lazy=True)
-    time_off_requests = db.relationship('TimeOffRequest', backref='employee', lazy=True)
+    shifts = db.relationship('src.models.schedule.Shift', backref='employee', lazy=True)
+    time_off_requests = db.relationship('src.models.schedule.TimeOffRequest', backref='employee', lazy=True)
     
     def __repr__(self):
         return f'<Employee {self.name}>'
