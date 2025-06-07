@@ -1,8 +1,6 @@
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 from src.extensions import db
-# your Shift, ShiftTemplate, TimeOffRequest models
-
 
 
 class Shift(db.Model):
@@ -20,10 +18,11 @@ class Shift(db.Model):
     
     # Relationships
     business = db.relationship('Business', backref='shifts', lazy=True)
-    employee = db.relationship('Employee', backref='shifts', lazy=True)
+    employee = db.relationship('Employee', backref='shifts', lazy=True)  # backref created here
     
     def __repr__(self):
         return f'<Shift {self.id} - Employee {self.employee_id}>'
+
 
 class ShiftTemplate(db.Model):
     __tablename__ = 'shift_templates'
@@ -43,6 +42,7 @@ class ShiftTemplate(db.Model):
     def __repr__(self):
         return f'<ShiftTemplate {self.name}>'
 
+
 class TimeOffRequest(db.Model):
     __tablename__ = 'time_off_requests'
     
@@ -57,10 +57,11 @@ class TimeOffRequest(db.Model):
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     
     business = db.relationship('Business', backref='time_off_requests', lazy=True)
-    employee = db.relationship('Employee', backref='time_off_requests', lazy=True)
+    employee = db.relationship('Employee', backref='time_off_requests', lazy=True)  # backref here
     
     def __repr__(self):
         return f'<TimeOffRequest {self.id} - Employee {self.employee_id}>'
+
 
 class Notification(db.Model):
     __tablename__ = 'notifications'

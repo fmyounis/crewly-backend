@@ -1,6 +1,5 @@
 from flask_sqlalchemy import SQLAlchemy
 from src.extensions import db
-# your Business, User, Employee models
 from datetime import datetime
 from werkzeug.security import generate_password_hash, check_password_hash
 
@@ -26,6 +25,7 @@ class Business(db.Model):
 
     def __repr__(self):
         return f'<Business {self.name}>'
+
 
 class User(db.Model):
     __tablename__ = 'users'
@@ -59,6 +59,7 @@ class User(db.Model):
     def __repr__(self):
         return f'<User {self.name}>'
 
+
 class Employee(db.Model):
     __tablename__ = 'employees'
     
@@ -71,9 +72,8 @@ class Employee(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     
-    # Relationships
-    shifts = db.relationship('src.models.schedule.Shift', backref='employee', lazy=True)
-    time_off_requests = db.relationship('src.models.schedule.TimeOffRequest', backref='employee', lazy=True)
+    # Removed explicit relationships to Shift and TimeOffRequest
+    # because those are handled by backrefs from schedule.py
     
     def __repr__(self):
         return f'<Employee {self.name}>'

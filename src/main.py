@@ -11,6 +11,7 @@ def create_app():
     # Configuration
     app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///crewly.db'
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+    app.config['SECRET_KEY'] = 'loveThis'
 
     # Initialize extensions
     db.init_app(app)
@@ -25,6 +26,9 @@ def create_app():
     def health_check():
         return {'status': 'running'}
 
+    with app.app_context():
+        db.create_all()  # Create tables if they don't exist
+
     return app
 
 # Gunicorn entrypoint
@@ -32,4 +36,4 @@ app = create_app()
 
 # CLI run support
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True, port=8000)

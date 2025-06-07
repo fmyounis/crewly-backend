@@ -14,8 +14,8 @@ def register():
     if not data or not all(k in data for k in ('name', 'email', 'password')):
         return jsonify({'message': 'Missing required fields!'}), 400
 
-    # Check if business already exists
-    if Business.query.filter_by(email=data['email']).first():
+    # Check if business already exists by name or email
+    if Business.query.filter((Business.email == data['email']) | (Business.name == data['name'])).first():
         return jsonify({'message': 'Business already exists!'}), 409
 
     # Create new business
@@ -23,8 +23,6 @@ def register():
         name=data['name'],
         email=data['email']
     )
-    new_business.set_password(data['password'])  # hash password
-
     db.session.add(new_business)
     db.session.commit()
 
@@ -35,7 +33,7 @@ def register():
         email=data['email'],
         role='admin'
     )
-    admin_user.set_password(data['password'])
+    admin_user.set_password(data['password'])  # Hash password
 
     db.session.add(admin_user)
     db.session.commit()
@@ -56,7 +54,7 @@ def login():
     if not user or not user.check_password(data['password']):
         return jsonify({'message': 'Invalid credentials!'}), 401
 
-    # Generate token
+    # Generate JWT token
     token = jwt.encode({
         'user_id': user.id,
         'business_id': user.business_id,
@@ -87,3 +85,33 @@ def get_user(current_user):
         'role': current_user.role,
         'business_id': current_user.business_id
     }), 200
+
+
+# Route to create a test user and business for initial testing
+@auth_bp.route('/create_test_user', methods=['POST'])
+def create_test_user():
+    # Check if test business already exists
+    test_business = Business.query.filter_by(email='test@example.com').first()
+    if test_business:
+        return jsonify({'message': 'Test business already exists!'}), 409
+
+    # Create test business
+    test_business = Business(
+        name='Test Business',
+        email='test@example.com'
+    )
+    db.session.add(test_business)
+    db.session.commit()
+
+    # Create test admin user
+    test_user = User(
+        business_id=test_business.id,
+        name='Test User',
+        email='test@example.com',
+        role='admin'
+    )
+    test_user.set_password('password123')
+    db.session.add(test_user)
+    db.session.commit()
+
+    return jsonify({'message': 'Test business and user created successfully!'}), 201
