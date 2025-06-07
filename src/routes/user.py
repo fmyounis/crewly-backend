@@ -11,12 +11,25 @@ def get_users():
 @user_bp.route('/users', methods=['POST'])
 def create_user():
     data = request.get_json()
-    if not data or 'username' not in data or 'email' not in data:
-        return jsonify({'message': 'Missing username or email'}), 400
+    if not data or 'name' not in data or 'email' not in data or 'password' not in data:
+        return jsonify({'message': 'Missing required fields: name, email, or password'}), 400
     
-    # Optionally, validate uniqueness here or rely on DB constraints
+    # Check if email already exists
+    if User.query.filter_by(email=data['email']).first():
+        return jsonify({'message': 'User with this email already exists'}), 409
     
-    user = User(username=data['username'], email=data['email'])
+    business_id = data.get('business_id')
+    if not business_id:
+        return jsonify({'message': 'business_id is required'}), 400
+    
+    user = User(
+        name=data['name'],
+        email=data['email'],
+        business_id=business_id,
+        role=data.get('role', 'manager')
+    )
+    user.set_password(data['password'])
+
     try:
         db.session.add(user)
         db.session.commit()
@@ -38,8 +51,12 @@ def update_user(user_id):
     if not data:
         return jsonify({'message': 'No data provided'}), 400
     
-    user.username = data.get('username', user.username)
+    user.name = data.get('name', user.name)
     user.email = data.get('email', user.email)
+    if 'password' in data:
+        user.set_password(data['password'])
+    user.role = data.get('role', user.role)
+    user.business_id = data.get('business_id', user.business_id)
     
     try:
         db.session.commit()
