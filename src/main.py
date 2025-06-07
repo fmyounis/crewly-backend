@@ -1,5 +1,5 @@
 from flask import Flask
-from src.models import db  # <-- from init now, not user
+from src.models import db  # <-- from models package now
 from src.routes.auth import auth_bp
 
 app = Flask(__name__)
