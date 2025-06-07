@@ -3,7 +3,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 import jwt
 from datetime import datetime, timedelta
 from src.models.user import db, Business, User
-from src.utils.auth_decorators import token_required  # import from new location
+from src.utils.auth_decorators import token_required  # import from your utils
 
 auth_bp = Blueprint('auth', __name__)
 
@@ -87,7 +87,6 @@ def get_user(current_user):
     }), 200
 
 
-# Route to create a test user and business for initial testing
 @auth_bp.route('/create_test_user', methods=['POST'])
 def create_test_user():
     # Check if test business already exists
@@ -115,3 +114,32 @@ def create_test_user():
     db.session.commit()
 
     return jsonify({'message': 'Test business and user created successfully!'}), 201
+
+
+# New route: Register additional user under existing business
+@auth_bp.route('/register_user', methods=['POST'])
+@token_required  # Require a logged-in user to add new users
+def register_user(current_user):
+    data = request.get_json()
+
+    required_fields = ('name', 'email', 'password', 'role')
+    if not data or not all(field in data for field in required_fields):
+        return jsonify({'message': 'Missing required fields!'}), 400
+
+    # Check if user email already exists
+    if User.query.filter_by(email=data['email']).first():
+        return jsonify({'message': 'User with this email already exists!'}), 409
+
+    # Create new user under the current user's business
+    new_user = User(
+        business_id=current_user.business_id,
+        name=data['name'],
+        email=data['email'],
+        role=data['role']
+    )
+    new_user.set_password(data['password'])  # Hash password
+
+    db.session.add(new_user)
+    db.session.commit()
+
+    return jsonify({'message': 'User registered successfully!'}), 201
