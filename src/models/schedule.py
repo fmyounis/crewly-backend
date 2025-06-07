@@ -1,7 +1,7 @@
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
+from src.models import db
 
-db = SQLAlchemy()
 
 class Shift(db.Model):
     __tablename__ = 'shifts'
