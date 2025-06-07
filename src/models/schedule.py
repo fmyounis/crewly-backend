@@ -1,6 +1,8 @@
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
-from src.models import db
+from src.extensions import db
+# your Shift, ShiftTemplate, TimeOffRequest models
+
 
 
 class Shift(db.Model):

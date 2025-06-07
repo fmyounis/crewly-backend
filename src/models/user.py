@@ -1,5 +1,6 @@
 from flask_sqlalchemy import SQLAlchemy
-from src.models import db
+from src.extensions import db
+# your Business, User, Employee models
 from datetime import datetime
 from werkzeug.security import generate_password_hash, check_password_hash
 

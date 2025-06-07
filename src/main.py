@@ -1,23 +1,35 @@
 from flask import Flask
-from src.models import db  # <-- from models package now
+from flask_cors import CORS
+from src.extensions import db
+from src.models import *  # Imports Business, User, Employee, Shift, ShiftTemplate, TimeOffRequest, Notification
 from src.routes.auth import auth_bp
+from src.routes.schedule import schedule_bp
 
-app = Flask(__name__)
+def create_app():
+    app = Flask(__name__)
 
-# Configure your database URI (example with SQLite)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///crewly.db'
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+    # Configuration
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///crewly.db'
+    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-# Secret key for JWT
-app.config['SECRET_KEY'] = 'Ffmonday$321'
+    # Initialize extensions
+    db.init_app(app)
+    CORS(app)
 
-# Initialize the database with app
-db.init_app(app)
+    # Register blueprints
+    app.register_blueprint(auth_bp, url_prefix='/auth')
+    app.register_blueprint(schedule_bp, url_prefix='/schedule')
 
-# Register blueprints
-app.register_blueprint(auth_bp, url_prefix='/auth')
+    # Health check route
+    @app.route('/health')
+    def health_check():
+        return {'status': 'running'}
 
+    return app
+
+# Gunicorn entrypoint
+app = create_app()
+
+# CLI run support
 if __name__ == '__main__':
-    with app.app_context():
-        db.create_all()  # Creates tables if missing
     app.run(debug=True)
