@@ -18,9 +18,10 @@ class Shift(db.Model):
     
     # Relationships
     business = db.relationship('Business', backref='shifts', lazy=True)
+    employee = db.relationship('Employee', backref='shifts', lazy=True)
     
     def __repr__(self):
-        return f'<Shift {self.id} - {self.employee_id}>'
+        return f'<Shift {self.id} - Employee {self.employee_id}>'
 
 class ShiftTemplate(db.Model):
     __tablename__ = 'shift_templates'
@@ -30,11 +31,13 @@ class ShiftTemplate(db.Model):
     name = db.Column(db.String(100), nullable=False)
     start_time = db.Column(db.Time, nullable=False)
     end_time = db.Column(db.Time, nullable=False)
-    days_of_week = db.Column(db.String(20))  # Comma-separated days (e.g., "0,1,3" for Sun,Mon,Wed)
+    days_of_week = db.Column(db.String(20))  # e.g., "0,1,3" for Sun,Mon,Wed
     role = db.Column(db.String(50))
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     
+    business = db.relationship('Business', backref='shift_templates', lazy=True)
+
     def __repr__(self):
         return f'<ShiftTemplate {self.name}>'
 
@@ -51,8 +54,11 @@ class TimeOffRequest(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     
+    business = db.relationship('Business', backref='time_off_requests', lazy=True)
+    employee = db.relationship('Employee', backref='time_off_requests', lazy=True)
+    
     def __repr__(self):
-        return f'<TimeOffRequest {self.id} - {self.employee_id}>'
+        return f'<TimeOffRequest {self.id} - Employee {self.employee_id}>'
 
 class Notification(db.Model):
     __tablename__ = 'notifications'
@@ -62,9 +68,12 @@ class Notification(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     title = db.Column(db.String(100), nullable=False)
     message = db.Column(db.Text, nullable=False)
-    type = db.Column(db.String(50))  # shift_change, time_off_request, etc.
+    type = db.Column(db.String(50))  # e.g., shift_change, time_off_request
     read = db.Column(db.Boolean, default=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     
+    business = db.relationship('Business', backref='notifications', lazy=True)
+    user = db.relationship('User', backref='notifications', lazy=True)
+
     def __repr__(self):
-        return f'<Notification {self.id} - {self.user_id}>'
+        return f'<Notification {self.id} - User {self.user_id}>'

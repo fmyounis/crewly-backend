@@ -7,7 +7,6 @@ employee_bp = Blueprint('employee', __name__)
 @employee_bp.route('/', methods=['GET'])
 @token_required
 def get_employees(current_user):
-    # Get all employees for the business
     employees = Employee.query.filter_by(business_id=current_user.business_id).all()
     
     output = []
@@ -27,7 +26,6 @@ def get_employees(current_user):
 @employee_bp.route('/<int:employee_id>', methods=['GET'])
 @token_required
 def get_employee(current_user, employee_id):
-    # Get specific employee
     employee = Employee.query.filter_by(
         id=employee_id, 
         business_id=current_user.business_id
@@ -50,19 +48,16 @@ def get_employee(current_user, employee_id):
 @employee_bp.route('/', methods=['POST'])
 @token_required
 def create_employee(current_user):
-    # Check if user has permission (admin or manager)
     if current_user.role not in ['admin', 'manager']:
         return jsonify({'message': 'Permission denied!'}), 403
     
     data = request.get_json()
-    
-    # Validate required fields
     required_fields = ['name', 'email', 'role']
+    
     for field in required_fields:
         if field not in data:
             return jsonify({'message': f'Missing required field: {field}'}), 400
     
-    # Create new employee
     new_employee = Employee(
         business_id=current_user.business_id,
         name=data['name'],
@@ -71,7 +66,6 @@ def create_employee(current_user):
         phone=data.get('phone', '')
     )
     
-    # Add employee to database
     db.session.add(new_employee)
     db.session.commit()
     
@@ -89,11 +83,9 @@ def create_employee(current_user):
 @employee_bp.route('/<int:employee_id>', methods=['PUT'])
 @token_required
 def update_employee(current_user, employee_id):
-    # Check if user has permission (admin or manager)
     if current_user.role not in ['admin', 'manager']:
         return jsonify({'message': 'Permission denied!'}), 403
     
-    # Get employee
     employee = Employee.query.filter_by(
         id=employee_id, 
         business_id=current_user.business_id
@@ -104,16 +96,12 @@ def update_employee(current_user, employee_id):
     
     data = request.get_json()
     
-    # Update employee details
     if 'name' in data:
         employee.name = data['name']
-    
     if 'email' in data:
         employee.email = data['email']
-    
     if 'phone' in data:
         employee.phone = data['phone']
-    
     if 'role' in data:
         employee.role = data['role']
     
@@ -133,11 +121,9 @@ def update_employee(current_user, employee_id):
 @employee_bp.route('/<int:employee_id>', methods=['DELETE'])
 @token_required
 def delete_employee(current_user, employee_id):
-    # Check if user has permission (admin only)
     if current_user.role != 'admin':
         return jsonify({'message': 'Permission denied!'}), 403
     
-    # Get employee
     employee = Employee.query.filter_by(
         id=employee_id, 
         business_id=current_user.business_id
@@ -146,7 +132,6 @@ def delete_employee(current_user, employee_id):
     if not employee:
         return jsonify({'message': 'Employee not found!'}), 404
     
-    # Delete employee
     db.session.delete(employee)
     db.session.commit()
     

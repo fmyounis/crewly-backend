@@ -1,6 +1,6 @@
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
-import uuid
+from werkzeug.security import generate_password_hash, check_password_hash
 
 db = SQLAlchemy()
 
@@ -18,6 +18,12 @@ class Business(db.Model):
     employees = db.relationship('Employee', backref='business', lazy=True)
     users = db.relationship('User', backref='business', lazy=True)
     
+    def set_password(self, password):
+        self.password = generate_password_hash(password)
+
+    def check_password(self, password):
+        return check_password_hash(self.password, password)
+
     def __repr__(self):
         return f'<Business {self.name}>'
 
@@ -32,7 +38,13 @@ class User(db.Model):
     role = db.Column(db.String(20), nullable=False, default='manager')  # admin, manager, employee
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
-    
+
+    def set_password(self, password):
+        self.password = generate_password_hash(password)
+
+    def check_password(self, password):
+        return check_password_hash(self.password, password)
+
     def __repr__(self):
         return f'<User {self.name}>'
 

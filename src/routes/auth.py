@@ -4,6 +4,7 @@ import jwt
 from datetime import datetime, timedelta
 from src.models.user import db, Business, User
 from src.main import app
+from jwt import ExpiredSignatureError, InvalidTokenError
 
 auth_bp = Blueprint('auth', __name__)
 
@@ -76,31 +77,15 @@ def login():
     
     return jsonify({'message': 'Invalid credentials!'}), 401
 
+from src.main import token_required  # import decorator from main.py
+
 @auth_bp.route('/user', methods=['GET'])
-def get_user():
-    token = None
-    
-    if 'Authorization' in request.headers:
-        auth_header = request.headers['Authorization']
-        if auth_header.startswith('Bearer '):
-            token = auth_header.split(' ')[1]
-    
-    if not token:
-        return jsonify({'message': 'Token is missing!'}), 401
-    
-    try:
-        data = jwt.decode(token, app.config['SECRET_KEY'], algorithms=["HS256"])
-        current_user = User.query.filter_by(id=data['user_id']).first()
-        
-        if not current_user:
-            return jsonify({'message': 'User not found!'}), 404
-        
-        return jsonify({
-            'id': current_user.id,
-            'name': current_user.name,
-            'email': current_user.email,
-            'role': current_user.role,
-            'business_id': current_user.business_id
-        }), 200
-    except:
-        return jsonify({'message': 'Token is invalid!'}), 401
+@token_required
+def get_user(current_user):
+    return jsonify({
+        'id': current_user.id,
+        'name': current_user.name,
+        'email': current_user.email,
+        'role': current_user.role,
+        'business_id': current_user.business_id
+    }), 200
