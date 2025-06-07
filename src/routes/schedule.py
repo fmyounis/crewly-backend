@@ -2,7 +2,8 @@ from flask import Blueprint, request, jsonify
 from datetime import datetime, timedelta, timezone
 from src.models.user import db, Employee
 from src.models.schedule import Shift, ShiftTemplate, TimeOffRequest
-from src.main import token_required
+from src.utils.auth import token_required
+
 
 schedule_bp = Blueprint('schedule', __name__)
 
