@@ -1,10 +1,9 @@
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify, current_app
 from werkzeug.security import generate_password_hash, check_password_hash
 import jwt
 from datetime import datetime, timedelta
 from src.models.user import db, Business, User
-from src.main import app
-from src.main import token_required  # Import the decorator from main.py
+from src.utils.auth_decorators import token_required  # import from new location
 
 auth_bp = Blueprint('auth', __name__)
 
@@ -63,7 +62,7 @@ def login():
         'business_id': user.business_id,
         'role': user.role,
         'exp': datetime.utcnow() + timedelta(hours=24)
-    }, app.config['SECRET_KEY'], algorithm="HS256")
+    }, current_app.config['SECRET_KEY'], algorithm="HS256")
 
     return jsonify({
         'message': 'Login successful!',
