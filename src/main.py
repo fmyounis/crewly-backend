@@ -4,12 +4,14 @@ from src.extensions import db
 from src.models import *  # Imports Business, User, Employee, Shift, ShiftTemplate, TimeOffRequest, Notification
 from src.routes.auth import auth_bp
 from src.routes.schedule import schedule_bp
+import os
 
 def create_app():
     app = Flask(__name__)
 
-    # Configuration
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///crewly.db'
+    # Absolute path for consistent SQLite location
+    basedir = os.path.abspath(os.path.dirname(__file__))
+    app.config['SQLALCHEMY_DATABASE_URI'] = f"sqlite:///{os.path.join(basedir, 'crewly.db')}"
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     app.config['SECRET_KEY'] = 'loveThis'
 
